@@ -53,10 +53,10 @@ fun main() {
 
     var menuNumber = ""
 
-    while (!menuNumber.equals("6", true)) {
+    while (!menuNumber.equals("5", true)) {
 
         freshScreen()
-        println("1. Check All Grades\n2. Add New Student\n3. Add Assignment\n4. Add Student Grade")
+        println("1. Check All Grades\n2. Add New Student\n3. Add Assignment\n4. Add Student Grade\n5. Quit")
         print("What would you like to do? ")
         menuNumber = readln()
 
