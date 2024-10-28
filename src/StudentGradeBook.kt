@@ -42,17 +42,22 @@ class Grade {
 
 fun main() {
 
+    // map for holding students' info.
     val studentMap = mutableMapOf<Student, Grade>()
 
+    // master objects to keep data consistent
     val masterStudent = Student("Master", "Master")
     val masterGrade = Grade()
 
+    // adding the master info to the map
     studentMap[masterStudent] = masterGrade
 
+    // studentSelector starts at 1 to leave the master info out of selection options
     var studentSelector = 1
 
     var menuNumber = ""
 
+    // main menu
     while (!menuNumber.equals("5", true)) {
 
         freshScreen()
@@ -77,18 +82,21 @@ fun main() {
                 // This sets a Student object as the key and a Grade object as the value. They are then added to studentMap.
                 studentMap[newStudent] = Grade()
 
-                // This updates the new student's total possible to match the master total possible.
+                // This updates the new student's total possible and assignment number to match the master's.
 
                 newStudent.assignmentList = masterStudent.assignmentList.toMutableMap()
                 studentMap[newStudent]?.totalPossible = masterGrade.totalPossible
 
                 newStudent.assignmentNumber = masterStudent.assignmentNumber
+
+                // After the studentSelector is added to the current student, it is raised by one to add to the next student.
                 studentSelector += 1
             }
 
             // Add an assignment in the form of a possible score
             "3" -> {
 
+                // The master is added to the list, so it will never be empty.
                 if (studentMap.size < 2) {
                     println("Assignments cannot be added until students have been added.")
                 }
@@ -105,12 +113,16 @@ fun main() {
                 }
             }
 
+            // Add a grade to a student's Grade object
             "4" -> {
+
                 if (studentMap.size < 2) {
                     println("Scores cannot be added until students have been added.")
                 }
 
                 else {
+
+                    // Int that correlates with te student's selector number
                     val selectedStudent = selectStudent(studentMap)
 
                     if (selectedStudent != 0) {
@@ -118,10 +130,12 @@ fun main() {
 
                         for (student in studentMap.keys) {
 
+                            // Grade object to allow access to student's score properties
                             val grades = studentMap[student]
 
                             if (student.studentSelector == selectedStudent){
 
+                                // updates the student's total score to include the added score
                                 grades!!.totalScore = newScore
                             }
                         }
@@ -138,8 +152,8 @@ fun listStudents(classList: MutableMap<Student, Grade>, addGrade: Boolean) {
 
     freshScreen()
 
+    // ensures that the total doesn't climb higher than it should when it is updated
     var totalPossible = 0F
-//    var totalScore = 0F
 
     if (classList.isEmpty()){
         println("No students to display.")
@@ -156,27 +170,25 @@ fun listStudents(classList: MutableMap<Student, Grade>, addGrade: Boolean) {
                 totalPossible = grade!!.totalPossible
             }
 
+            // initates/resets the gradePercentage variable
             var gradePercentage = 0F
 
             if (student.firstName != "Master") {
 
+                // creates a Grade object
                 val studentsGrade = classList[student]
 
-//                for (assignment in student.assignmentList.keys) {
-//
-//                    var studentScore = student.assignmentList[assignment]?.score
-//
-//                    totalScore += studentScore!!
-//                }
-
+                // ensures that "Nan" isn't returned for the percentage by making it 0 instead
                 if (gradePercentage.isNaN()) {
                     gradePercentage = 0F
                 }
 
+                // calculates and returns the grade percentage
                 else {
                     gradePercentage = studentsGrade!!.calculateGrade(studentsGrade.totalScore, totalPossible)
                 }
 
+                // formats
                 if (addGrade) {
                     println("${student.studentSelector}. ${student.firstName} ${student.lastName}")
                 } else {
@@ -233,10 +245,12 @@ fun getLetterGrade(gradePercentage: Float): String {
     return letterGrade
 }
 
+// This function gets input from the user and adds a new "assignment" by creating a score.
 fun createPossibleScore(): Float {
 
     var possibleScore = ""
 
+    // toFloatOrNull makes possibleScore a float or returns null if it can't. This is used often in the program
     while(possibleScore.toFloatOrNull() == null) {
 
         print("\nPossible Score: ")
@@ -246,6 +260,7 @@ fun createPossibleScore(): Float {
             break
         }
 
+        // users can enter "back" instead of entering a score
         else if (possibleScore == "back"){
 
             possibleScore = "0"
@@ -264,9 +279,10 @@ fun createPossibleScore(): Float {
 
 
 
-// This function adds the***********************************************************************************************************
+// This function allows the user to add a score for each of the student's assignments
 fun addAssignment(classList: MutableMap<Student, Grade>,  score: Float) {
 
+    // loops through each student in the map that was passed in
     for (student in classList.keys) {
 
         // creates a new Grade object to be the value of the map stored in the Student object
@@ -282,8 +298,10 @@ fun addAssignment(classList: MutableMap<Student, Grade>,  score: Float) {
     }
 }
 
+// This function allows the user to select a student number from a printed list and returns the Int.
 fun selectStudent(classList: MutableMap<Student, Grade>): Int {
 
+    // this list is a list of student numbers. If the user's choice isn't in this list, the program will keep looping and asking for a student number.
     val numberList = mutableListOf<Int>()
 
     if (classList.isEmpty()) {
@@ -292,6 +310,7 @@ fun selectStudent(classList: MutableMap<Student, Grade>): Int {
     }
     else {
 
+        // Master will not be included in the list
         for (student in classList.keys) {
             if (student.firstName != "Master") {
                 numberList.add(student.studentSelector)
@@ -300,6 +319,7 @@ fun selectStudent(classList: MutableMap<Student, Grade>): Int {
 
         var chosenStudent = ""
 
+        // the user's entry must be an Int and in the number list
         while (chosenStudent.toIntOrNull() == null || chosenStudent.toIntOrNull() !in numberList) {
 
             listStudents(classList, true)
@@ -310,6 +330,7 @@ fun selectStudent(classList: MutableMap<Student, Grade>): Int {
             if (chosenStudent.toIntOrNull() in numberList) {
                 break
 
+            // User's can type "back" to return to the main menu.
             } else if (chosenStudent == "back") {
                 chosenStudent = "0"
                 break
@@ -324,6 +345,8 @@ fun selectStudent(classList: MutableMap<Student, Grade>): Int {
     }
 }
 
+// This function takes the Int from the selectStudent function to list the student's assignements and asks for a student's score on an assignment.
+// Once the score is entered, the function returns it as a Float.
 fun addScore(classList: MutableMap<Student, Grade>, chosenStudent: Int): Float {
 
     val assignments = mutableListOf<Int>()
@@ -336,11 +359,14 @@ fun addScore(classList: MutableMap<Student, Grade>, chosenStudent: Int): Float {
 
     for (student in classList.keys) {
 
+        // If the student number matches the int, the program goes through the assignments and prints them
         if (student.studentSelector == chosenStudent){
 
             for (assignment in student.assignmentList.keys) {
                 assignments.add(assignment)
                 scorePossible = student.assignmentList[assignment]!!.scorePossible
+
+                //This adds the assignment scores to a list that allows the possible score to be accessed easily
                 assignmentScores.add(scorePossible)
                 println("${assignment}. ${scorePossible} pts. possible")
             }
@@ -360,6 +386,7 @@ fun addScore(classList: MutableMap<Student, Grade>, chosenStudent: Int): Float {
         }
     }
 
+    // A student's score can only be as high as the possible score.
     var newScore = ""
     scorePossible = assignmentScores[assignmentNumber.toInt().minus(1)]
     while (newScore.toFloatOrNull() == null || newScore.toFloat() > scorePossible) {
